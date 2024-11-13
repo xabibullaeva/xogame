@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container"> 
+    <div class="game-container">
+      <div class="game-board" id="gameBoard">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+      </div>
+      <div class="game-info">
+        <p>Player X's Turn</p>
+        <div class="score">
+          <span class="scoreX">Player X: <span id="scoreX">0</span></span>
+          <span class="scoreO">Player O: <span id="scoreO">0</span></span>
+        </div>
+        <button id="resetButton">Reset Game</button>
+      </div>
+    </div>
+  </div>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: plum;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      grid-gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      border: 2px solid purple;
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      cursor: pointer;
+      background-color: plum;
+      box-shadow: 0 2px 5px rgb(228, 175, 228);
+    }
+
+    .cell:hover {
+      background-color: rgb(228, 175, 228);
+    }
+
+    .game-info {
+      text-align: center;
+    }
+
+    #resetButton {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: plum;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .score {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 5px;
+    }
+
+    .score span {
+      font-size: 18px;
+      color: purple;
+    }
+  </style>
+  <script>
+    const gameBoard = document.getElementById('gameBoard');
+    const cells = document.querySelectorAll('.cell');
+    const resetButton = document.getElementById('resetButton');
+    const scoreX = document.getElementById('scoreX');
+    const scoreO = document.getElementById('scoreO');
+
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let score = { 'X': 0, 'O': 0 };
+
+    const winningCombinations = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function checkWin() {
+      for (let i = 0; i < winningCombinations.length; i++) {
+        const [a, b, c] = winningCombinations[i];
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return board[a];
+        }
+      }
+      return null;
+    }
+
+    function handleCellClick(index) {
+      if (board[index] !== '' || !gameActive) return;
+
+      board[index] = currentPlayer;
+      cells[index].textContent = currentPlayer;
+      cells[index].classList.add(currentPlayer);
+
+      const winner = checkWin();
+      if (winner) {
+        gameActive = false;
+        updateScore(winner);
+        setTimeout(() => {
+          alert(`Player ${winner} wins!`);
+        }, 50); 
+        return;
+      }
+
+      if (!board.includes('')) {
+        gameActive = false;
+        setTimeout(() => {
+          alert("It's a draw!");
+        }, 50);
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      updateTurnMessage();
+    }
+
+    function updateTurnMessage() {
+      document.querySelector('.game-info > p').textContent = `Player ${currentPlayer}'s Turn`;
+    }
+
+    function updateScore(winner) {
+      score[winner]++;
+      scoreX.textContent = score['X'];
+      scoreO.textContent = score['O'];
+    }
+
+    function resetGame() {
+      gameActive = true;
+      currentPlayer = 'X';
+      board = ['', '', '', '', '', '', '', '', ''];
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('X', 'O');
+      });
+      updateTurnMessage();
+    }
+
+    cells.forEach(cell => cell.addEventListener('click', () => handleCellClick(parseInt(cell.dataset.index))));
+    resetButton.addEventListener('click', resetGame);
+  </script>
+
+</body>
+</html>
